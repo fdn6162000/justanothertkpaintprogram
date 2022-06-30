@@ -1,5 +1,7 @@
 # Imports
 from tkinter import *
+import math
+
 
 class App:
     def mb_one_down(self, event):
@@ -8,6 +10,13 @@ class App:
         self.mb_one = False
     def mb_motion(self, event):
         self.m_x, self.m_y = event.x, event.y
+    def mb_update(self):
+        self.m_x_c = self.m_x
+        self.m_y_c = self.m_y
+        if (self.mb_one):
+            self.paint_line(self.m_x_p, self.m_y_p, self.m_x_c, self.m_y_c)
+        self.m_x_p = self.m_x_c
+        self.m_y_p = self.m_y_c
     def __init__(self):
         # Setup the window
         self.root = Tk()
@@ -26,18 +35,35 @@ class App:
         self.mb_one = False
         self.m_x = 0
         self.m_y = 0
+        self.m_x_c = 0
+        self.m_y_c = 0
+        self.m_x_p = 0
+        self.m_y_p = 0
         # Binds
         self.canvas.bind("<Button-1>", self.mb_one_down)
         self.canvas.bind('<ButtonRelease-1>', self.mb_one_up)
         self.canvas.bind('<Motion>', self.mb_motion)
-    def custom_update(self):
-        if (self.mb_one):
-            self.m_image.put('black', (self.m_x, self.m_y))
     def custom_main_loop(self):
         while True:
-            self.custom_update()
+            self.mb_update()
             self.root.update_idletasks()
             self.root.update()
+    def safeput(self, ix, iy):
+        tempx = int(ix)
+        tempy = int(iy)
+        if (tempx >= 0 & tempy >= 0 & tempx <= 320 & tempy <= 240):
+            self.m_image.put('black', (int(tempx),int(tempy)) )
+    def paint_line(self, x1, y1, x2, y2):
+        tempx = x1
+        xdir = math.copysign(1, x2-x1)
+        tempy = y1
+        ydir = math.copysign(1, y2-y1)
+        while ( (not tempx == x2)|(not tempy == y2) ):
+            self.safeput(tempx, tempy)
+            if (not tempx == x2):
+                tempx += xdir
+            if (not tempy == y2):
+                tempy += ydir
             
 app = App()
 app.custom_main_loop()
