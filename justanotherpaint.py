@@ -1,9 +1,13 @@
 # Imports
 from tkinter import *
+from tkinter import colorchooser
 import math
-
+import time
 
 class App:
+    def color_button_press(self):
+        color_tuple = colorchooser.askcolor(title="Please pick a color...")
+        self.selected_color = color_tuple[1]
     def mb_one_down(self, event):
         self.mb_one = True
     def mb_one_up(self, event):
@@ -31,6 +35,14 @@ class App:
         self.m_image.put('white', to=(0, 0, 320, 240))
         # Display image on canvas
         self.canvas.create_image(0,0,anchor=NW,image=self.m_image)
+        # Create the color button
+        self.selected_color = 'black'
+        self.color_button = Button(self.root, text="Pick Color", command=self.color_button_press)
+        self.color_button.pack()
+        # Create the sleep check box
+        self.sleep_var = IntVar()
+        self.sleep_check = Checkbutton(self.root, text="Sleep between frames", variable=self.sleep_var, onvalue=1, offvalue=0)
+        self.sleep_check.pack()
         # Setup control for left click on canvas
         self.mb_one = False
         self.m_x = 0
@@ -48,11 +60,13 @@ class App:
             self.mb_update()
             self.root.update_idletasks()
             self.root.update()
+            if self.sleep_var.get() == 1:
+                time.sleep(0.01)
     def safeput(self, ix, iy):
         tempx = int(ix)
         tempy = int(iy)
         if (tempx >= 0 & tempy >= 0 & tempx <= 320 & tempy <= 240):
-            self.m_image.put('black', (int(tempx),int(tempy)) )
+            self.m_image.put(self.selected_color, (int(tempx),int(tempy)) )
     def paint_line(self, x1, y1, x2, y2):
         tempx = x1
         xdir = math.copysign(1, x2-x1)
